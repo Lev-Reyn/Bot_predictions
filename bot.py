@@ -5,11 +5,11 @@ from aiogram.utils.exceptions import BotBlocked
 from config import token
 from work_with_data_users.work_with_data_users import WorkWithDataUsers
 import aioschedule
-
+import asyncio
 
 bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
-import asyncio
+
 
 
 @dp.message_handler(commands=['start'])
@@ -35,7 +35,7 @@ async def start_process_command(message: types.Message):
 
 
 @dp.message_handler()
-async def start_process_command_no_command():
+async def start_process_command_no_command(message: types.Message):
     """отправляет всем зареганым предсказание"""
     for user_telegram_id in WorkWithDataUsers('664295561').get_all_users():
         try:
