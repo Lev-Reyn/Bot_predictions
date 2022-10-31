@@ -2,7 +2,7 @@ import json
 
 file = open('testpredictions.txt')
 lst = []
-for i in range(20):
+for i in range():
     lst.append(file.readline().strip())
 print(lst)
 

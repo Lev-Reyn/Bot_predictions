@@ -1,5 +1,5 @@
 import os
-from in_json import InJson
+from work_with_data_users.in_json import InJson
 from random import choice
 
 
