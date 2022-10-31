@@ -11,7 +11,6 @@ bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
 
 
-
 @dp.message_handler(commands=['start'])
 async def start_process_command(message: types.Message):
     """начало работы бота"""
@@ -34,9 +33,10 @@ async def start_process_command(message: types.Message):
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
 
 
-@dp.message_handler()
-async def start_process_command_no_command(message: types.Message):
+# @dp.message_handler()
+async def timer_no_command():
     """отправляет всем зареганым предсказание"""
+    print('pizda')
     for user_telegram_id in WorkWithDataUsers('664295561').get_all_users():
         try:
             await bot.send_message(user_telegram_id, WorkWithDataUsers(user_telegram_id).get_prediction())
@@ -46,10 +46,10 @@ async def start_process_command_no_command(message: types.Message):
 
 
 async def scheduler():
-    aioschedule.every().day.at("11:14").do(start_process_command_no_command)
+    aioschedule.every().day.at("00:56").do(timer_no_command)
     while True:
         await aioschedule.run_pending()
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
 
 
 async def on_startup(_):
