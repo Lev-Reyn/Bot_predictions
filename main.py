@@ -24,6 +24,7 @@ async def start_process_command(message: types.Message):
 @dp.message_handler(commands=['send_prediction'])
 async def start_process_command(message: types.Message):
     """отправляет всем зареганым предсказание"""
+    print(message.text)
     for user_telegram_id in WorkWithDataUsers(message.from_user.id).get_all_users():
         try:
             await bot.send_message(user_telegram_id, WorkWithDataUsers(user_telegram_id).get_prediction())
@@ -43,14 +44,25 @@ async def start_process_command_no_command():
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
 
 
-async def scheduler(m):
-    """позволяет запустить функцию в определённое время"""
-    aioschedule.every().day.at("09:30").do(start_process_command_no_command)
+async def scheduler():
+    aioschedule.every().day.at("11:14").do(start_process_command_no_command)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
 
 
+async def on_startup(_):
+    asyncio.create_task(scheduler())
+
+
 if __name__ == '__main__':
-    # executor.start_polling(dp, on_startup=scheduler)
-    executor.start_polling(dp, skip_updates=True, on_startup=scheduler)
+    # executor.start_polling(dp)
+    # executor.start_polling(dp, skip_updates=True, on_startup=scheduler)
+    executor.start_polling(dp, skip_updates=False, on_startup=on_startup)
+
+# async def scheduler(m):
+#     """позволяет запустить функцию в определённое время"""
+#     aioschedule.every().day.at("11:08").do(start_process_command_no_command)
+#     while True:
+#         await aioschedule.run_pending()
+#         await asyncio.sleep(1)
