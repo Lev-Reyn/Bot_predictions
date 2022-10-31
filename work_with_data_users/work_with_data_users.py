@@ -1,6 +1,7 @@
 import os
 from work_with_data_users.in_json import InJson
 from random import choice
+import csv
 
 
 class WorkWithDataUsers(InJson):
@@ -34,6 +35,31 @@ class WorkWithDataUsers(InJson):
         if len(predictions) == 0:
             return 'на сегодня пиздец, нет у меня для тебя предсказания :('
         return self.add_prediction_in_user_file(choice(predictions))
+
+    def get_info_about_users(self) -> list:
+        """метод собирает информацию о пользователях бота, пока что просто их id и сколько они получили сообщений"""
+        data_info_about_user_lst = []  # словарь, в котором ключи - это telegram_id, а значения - кол-во предсказаний
+        data_info_about_users = os.listdir('data_users')
+        for user in data_info_about_users:
+            super().__init__(f'data_users/{user}')
+            user_old_predictions = len(super().reed_json())  # количество отправленных предсказаний этому пользователю
+            data_info_about_user_lst.append({
+                'telegram_id': user[:-9],
+                'count_predictions': user_old_predictions})
+        return data_info_about_user_lst
+
+    def create_csv_info_about_users(self, data_info_about_user_lst=None):
+        """cоздаёт csv файл по списку словарей, если ничего не передали в метод, то собирает инфу о юзерах из
+         get_info_about_users"""
+        if not data_info_about_user_lst:
+            data_info_about_user_lst = self.get_info_about_users()
+        with open('data_info_about_user.csv', 'w') as csvfile:
+            fieldnames = [str(key) for key in data_info_about_user_lst[0]]
+            writer = csv.DictWriter(csvfile, delimiter=',', fieldnames=fieldnames)
+            writer.writeheader()
+            for user in data_info_about_user_lst:
+                writer.writerow(user)
+
 
 
 if __name__ == '__main__':

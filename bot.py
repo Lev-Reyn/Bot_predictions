@@ -2,6 +2,7 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from aiogram.utils.exceptions import BotBlocked
+from aiogram.types import InputFile  # для того, что бы отправлять файлы
 from config import token
 from work_with_data_users.work_with_data_users import WorkWithDataUsers
 import aioschedule
@@ -13,7 +14,8 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=['start'])
 async def start_process_command(message: types.Message):
-    """начало работы бота"""
+    """начало работы бота
+    (доработать так, что бы собиралась информация о пользователях бота (full_name, username, is_premium и т.д.)"""
     await message.delete()
     WorkWithDataUsers(message.from_user.id)
     await bot.send_message(message.from_user.id, 'Привет, я предсказываю будущее, и если тебе не похуй, то забей'
@@ -22,8 +24,8 @@ async def start_process_command(message: types.Message):
 
 
 @dp.message_handler(commands=['send_prediction'])
-async def start_process_command(message: types.Message):
-    """отправляет всем зареганым предсказание"""
+async def send_predictions_process_command(message: types.Message):
+    """отправляет всем зареганым предсказание (добавить пароль надо)"""
     print(message.text)
     for user_telegram_id in WorkWithDataUsers(message.from_user.id).get_all_users():
         try:
@@ -31,6 +33,21 @@ async def start_process_command(message: types.Message):
         except BotBlocked:
             # нужно добавлять в список тех, кто остановил бота, и возможно потом удалять их, хз
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
+
+
+@dp.message_handler(commands=['get_info_about_users'])
+async def get_info_about_users_process_command(message: types.Message):
+    """получить информацию о пользователях:
+     количество пользователей
+     их telegram_id
+     count_predictions
+     может потом ещё, что добавить можно будет, дополнительно проверка пароля будет так же"""
+
+    await bot.send_message(message.from_user.id,
+                           f'number of users {len(WorkWithDataUsers(message.from_user.id).get_info_about_users())}')
+    WorkWithDataUsers(message.from_user.id).create_csv_info_about_users()
+    path = 'data_info_about_user.csv'
+    await message.answer_document(InputFile(path))
 
 
 # @dp.message_handler()

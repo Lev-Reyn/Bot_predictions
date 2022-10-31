@@ -17,3 +17,21 @@
 В ближайшие дни остерегайся зеркального отражения! Иначе ты увидишь свою смазливую рожу и впадёшь в депрессию.
 Не вздумайте ходить в бильярдные клубы с бухлом, иначе вместо бильярдных шариков окажутся ваши яйца
 
+
+
+
+[Unit]
+Description=Telegram bot Predictions
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/bin/Bot_predictions
+ExecStart=python3 /usr/local/bin/Bot_predictions/bot.py
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
