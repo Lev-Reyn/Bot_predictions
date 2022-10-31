@@ -45,7 +45,7 @@ async def start_process_command_no_command():
 
 async def scheduler(m):
     """позволяет запустить функцию в определённое время"""
-    aioschedule.every().day.at("03:47").do(start_process_command_no_command)
+    aioschedule.every().day.at("09:30").do(start_process_command_no_command)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
