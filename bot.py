@@ -7,9 +7,12 @@ from config import token
 from work_with_data_users.work_with_data_users import WorkWithDataUsers
 import aioschedule
 import asyncio
+from mytime.mytime import MyTime  # класс для подсчёта времени до следующего предсказания
 
 bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
+
+time_predications = '10:14'
 
 
 @dp.message_handler(commands=['start'])
@@ -43,6 +46,12 @@ async def help_process_command(message: types.Message):
                                                  f' выход https://vk.com/bomji.sarapul')
 
 
+@dp.message_handler(commands=['next_prediction'])
+async def next_prediction_process_command(message: types.Message):
+    await bot.send_message(message.from_user.id,
+                           f'следующее предсказание будет через {MyTime(time_predications).next_prediction_func()}🙊')
+
+
 @dp.message_handler(commands=['get_info_about_users'])
 async def get_info_about_users_process_command(message: types.Message):
     """получить информацию о пользователях:
@@ -71,7 +80,7 @@ async def timer_no_command():
 
 
 async def scheduler():
-    aioschedule.every().day.at("00:56").do(timer_no_command)
+    aioschedule.every().day.at(time_predications).do(timer_no_command)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(5)
