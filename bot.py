@@ -12,7 +12,7 @@ from mytime.mytime import MyTime  # класс для подсчёта врем�
 bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
 
-time_predications = '10:14'
+time_predications = '10:14'  # время отправления предсказания
 
 
 @dp.message_handler(commands=['start'])
@@ -53,7 +53,9 @@ async def help_process_command(message: types.Message):
 @dp.message_handler(commands=['next_prediction'])
 async def next_prediction_process_command(message: types.Message):
     await bot.send_message(message.from_user.id,
-                           f'следующее предсказание будет через {MyTime(time_predications).next_prediction_func()}🙊')
+                           f'следующее предсказание '
+                           f'будет через {MyTime(time_predications).next_prediction_declensions_func()}🙊 '
+                           f'но помни, что бывают неожиданные предсказания 👺')
 
 
 @dp.message_handler(commands=['get_info_about_users'])

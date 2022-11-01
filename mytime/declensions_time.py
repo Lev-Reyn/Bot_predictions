@@ -1,21 +1,3 @@
-# import json
-#
-# file = open('testpredictions.txt')
-# lst = []
-# for i in range():
-#     lst.append(file.readline().strip())
-# print(lst)
-#
-# with open('data_predictions/predictions.json', 'w') as file:
-#     json.dump(lst, file, indent=4, ensure_ascii=False)
-#
-#
-
-
-from datetime import datetime as dt
-
-
-# число, "0 друзей", "1 друг", "2 друга"
 def declension(n, form_0, form_1, form_2):
     units = n % 10
     tens = (n // 10) % 10
@@ -30,10 +12,13 @@ def declension(n, form_0, form_1, form_2):
 
 
 def russian_time(hour, minute):
+    """склоняет часы и минуты.
+        принимает:
+            часы
+            минуты
+        возвращает:
+            строку просклоненную"""
     h = declension(hour, 'часов', 'час', 'часа')
     m = declension(minute, 'минут', 'минуту', 'минуты')
 
     return f'{hour} {h} {minute} {m} '
-
-
-print(russian_time(hour=10, minute=1))
