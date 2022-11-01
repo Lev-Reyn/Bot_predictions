@@ -30,7 +30,11 @@ async def start_process_command(message: types.Message):
 
 @dp.message_handler(commands=['send_prediction'])
 async def send_predictions_process_command(message: types.Message):
-    """отправляет всем зареганым предсказание (добавить пароль надо)"""
+    """отправляет всем зареганым предсказание
+
+    для того, что бы запустилась эта команда, необходимо, что бы в сообщении было слово гейоргий"""
+    if 'гейоргий' not in message.text:
+        return None
     # print(message.text)
     for user_telegram_id in WorkWithDataUsers(message.from_user.id).get_all_users():
         try:
@@ -58,8 +62,12 @@ async def get_info_about_users_process_command(message: types.Message):
      количество пользователей
      их telegram_id
      count_predictions
-     может потом ещё, что добавить можно будет, дополнительно проверка пароля будет так же"""
+     может потом ещё, что добавить можно будет, дополнительно проверка пароля будет так же
 
+     для того, что бы запустилась эта команда, необходимо, что бы в сообщении было слово гейоргий
+     """
+    if 'гейоргий' not in message.text:
+        return None
     await bot.send_message(message.from_user.id,
                            f'number of users {len(WorkWithDataUsers(message.from_user.id).get_info_about_users())}')
     WorkWithDataUsers(message.from_user.id).create_csv_info_about_users()
