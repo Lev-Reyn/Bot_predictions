@@ -18,21 +18,29 @@ async def start_process_command(message: types.Message):
     (доработать так, что бы собиралась информация о пользователях бота (full_name, username, is_premium и т.д.)"""
     await message.delete()
     WorkWithDataUsers(message.from_user.id)
-    await bot.send_message(message.from_user.id, 'Привет, я предсказываю будущее, и если тебе не похуй, то забей'
-                                                 ' хуй и раз в день получай эту хуйню, ведь это точно правдивые '
-                                                 'предсказания!!!')
+    await bot.send_message(message.from_user.id,
+                           f"{message.from_user.full_name}, это бот хмельных вечеров, но в телеге я буду дневным 😱, "
+                           f"в общем, я предсказываю будущее, каждое утро ты будешь получать от меня сообщение, они "
+                           f"тебя могут испугать, так что осторожней"
+                           f" и если не подпишешься на https://vk.com/bomji.sarapul" + ", то ты БОМЖ... или СОМЖ")
 
 
 @dp.message_handler(commands=['send_prediction'])
 async def send_predictions_process_command(message: types.Message):
     """отправляет всем зареганым предсказание (добавить пароль надо)"""
-    print(message.text)
+    # print(message.text)
     for user_telegram_id in WorkWithDataUsers(message.from_user.id).get_all_users():
         try:
             await bot.send_message(user_telegram_id, WorkWithDataUsers(user_telegram_id).get_prediction())
         except BotBlocked:
             # нужно добавлять в список тех, кто остановил бота, и возможно потом удалять их, хз
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
+
+
+@dp.message_handler(commands=['help'])
+async def help_process_command(message: types.Message):
+    await bot.send_message(message.from_user.id, f'{message.from_user.full_name}, помощи нет, хмель единственный твой'
+                                                 f' выход https://vk.com/bomji.sarapul')
 
 
 @dp.message_handler(commands=['get_info_about_users'])
