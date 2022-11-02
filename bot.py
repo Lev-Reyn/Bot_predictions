@@ -8,6 +8,7 @@ from work_with_data_users.work_with_data_users import WorkWithDataUsers
 import aioschedule
 import asyncio
 from mytime.mytime import MyTime  # класс для подсчёта времени до следующего предсказания
+from work_with_data_users.in_json import InJsonDict
 
 bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
@@ -26,6 +27,10 @@ async def start_process_command(message: types.Message):
                            f"в общем, я предсказываю будущее, каждое утро ты будешь получать от меня сообщение, они "
                            f"тебя могут испугать, так что осторожней"
                            f" и если не подпишешься на https://vk.com/bomji.sarapul" + ", то ты БОМЖ... или СОМЖ")
+    WorkWithDataUsers(message.from_user.id).add_info_about_user_statistics(count_touch_start=True,
+                                                                           username=message.from_user.username,
+                                                                           full_name=message.from_user.full_name,
+                                                                           work_or_stop='+')
 
 
 @dp.message_handler(commands=['send_prediction'])
@@ -39,13 +44,19 @@ async def send_predictions_process_command(message: types.Message):
     for user_telegram_id in WorkWithDataUsers(message.from_user.id).get_all_users():
         try:
             await bot.send_message(user_telegram_id, WorkWithDataUsers(user_telegram_id).get_prediction())
+            WorkWithDataUsers(user_telegram_id).add_info_about_user_statistics(work_or_stop='+')
         except BotBlocked:
             # нужно добавлять в список тех, кто остановил бота, и возможно потом удалять их, хз
+            WorkWithDataUsers(user_telegram_id).add_info_about_user_statistics(work_or_stop='-')
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
 
 
 @dp.message_handler(commands=['help'])
 async def help_process_command(message: types.Message):
+    WorkWithDataUsers(message.from_user.id).add_info_about_user_statistics(count_touch_help=True,
+                                                                           username=message.from_user.username,
+                                                                           full_name=message.from_user.full_name,
+                                                                           work_or_stop='+')
     await bot.send_message(message.from_user.id, f'{message.from_user.full_name}, помощи нет, хмель единственный твой'
                                                  f' выход https://vk.com/bomji.sarapul')
 
@@ -56,6 +67,10 @@ async def next_prediction_process_command(message: types.Message):
                            f'следующее предсказание '
                            f'будет через {MyTime(time_predications).next_prediction_declensions_func()}🙊 '
                            f'но помни, что бывают неожиданные предсказания 👺')
+    WorkWithDataUsers(message.from_user.id).add_info_about_user_statistics(count_touch_next_prediction=True,
+                                                                           username=message.from_user.username,
+                                                                           full_name=message.from_user.full_name,
+                                                                           work_or_stop='+')
 
 
 @dp.message_handler(commands=['get_info_about_users'])
@@ -77,6 +92,19 @@ async def get_info_about_users_process_command(message: types.Message):
     await message.answer_document(InputFile(path))
 
 
+@dp.message_handler(commands=['get_statistics_about_users'])
+async def get_info_about_users_process_command(message: types.Message):
+    """получить статистику о юзерах """
+    if 'гейоргий' not in message.text:
+        return None
+    await bot.send_message(message.from_user.id, 'два вида статистики, в json формате и csv')
+    await message.answer_document(InputFile('statistics/data_about_users_statistics.json'))
+
+    InJsonDict('statistics/data_about_users_statistics.json').json_in_csv('statistics/data_about_users_statistics.csv',
+                                                                          key_one=str(message.from_user.id))
+    await message.answer_document(InputFile('statistics/data_about_users_statistics.csv'))
+
+
 # @dp.message_handler()
 async def timer_no_command():
     """отправляет всем зареганым предсказание"""
@@ -84,9 +112,12 @@ async def timer_no_command():
     for user_telegram_id in WorkWithDataUsers('664295561').get_all_users():
         try:
             await bot.send_message(user_telegram_id, WorkWithDataUsers(user_telegram_id).get_prediction())
+            WorkWithDataUsers(user_telegram_id).add_info_about_user_statistics(work_or_stop='+')
+
         except BotBlocked:
             # нужно добавлять в список тех, кто остановил бота, и возможно потом удалять их, хз
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
+            WorkWithDataUsers(user_telegram_id).add_info_about_user_statistics(work_or_stop='-')
 
 
 async def scheduler():
@@ -111,3 +142,7 @@ if __name__ == '__main__':
 #     while True:
 #         await aioschedule.run_pending()
 #         await asyncio.sleep(1)
+
+
+
+#  доработать статистику, она должна распространяца на блокировки

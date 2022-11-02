@@ -1,10 +1,12 @@
 import os
-from work_with_data_users.in_json import InJson
+from work_with_data_users.in_json import InJson, InJsonDict
+# from in_json import InJson, InJsonDict
 from random import choice
+from datetime import datetime
 import csv
 
 
-class WorkWithDataUsers(InJson):
+class WorkWithDataUsers(InJson, InJsonDict):
     def __init__(self, telegram_id: str):
         self.telegram_id = telegram_id
         super().__init__(f'data_users/{self.telegram_id}user.json')
@@ -60,10 +62,65 @@ class WorkWithDataUsers(InJson):
             for user in data_info_about_user_lst:
                 writer.writerow(user)
 
+    def add_info_about_user_statistics(self, username=None, full_name=None, work_or_stop=None, count_touch_help=None,
+                                       count_touch_next_prediction=None, count_touch_start=None):
+        """тестовый метод, который собирает статистику о пользователях (создаём json файлик, в котором будет инфа)
+         структура:
+            словарь со словарями (во внутренем словаре ключи - это данные об этом пользователе, так же и id там будет
+            тоже )
+        """
+
+        InJsonDict.__init__(self, 'statistics/data_about_users_statistics.json')
+
+        data_statistics = InJsonDict.reed_json(self)
+        data_statistics: dict
+        if not data_statistics.get(str(self.telegram_id)):
+            data_statistics[str(self.telegram_id)] = {
+                'telegram_id': str(self.telegram_id),
+                'username': '',
+                'full_name': '',
+                'work_or_stop': '',
+                'last_use_bot': '',
+                'all_uses': [],
+                'count_touch_help': 0,
+                'count_touch_next_prediction': 0,
+                'count_touch_start': 0,
+                'predictions': []
+            }
+        if username:
+            data_statistics[str(self.telegram_id)]['username'] = username
+        if full_name:
+            data_statistics[str(self.telegram_id)]['full_name'] = full_name
+        if work_or_stop:
+            data_statistics[str(self.telegram_id)]['work_or_stop'] = work_or_stop
+        if count_touch_help:
+            data_statistics[str(self.telegram_id)]['count_touch_help'] += 1
+        if count_touch_next_prediction:
+            data_statistics[str(self.telegram_id)]['count_touch_next_prediction'] += 1
+        if count_touch_start:
+            data_statistics[str(self.telegram_id)]['count_touch_start'] += 1
+
+        # всегда проверяем время, так как это время последнего использования бота
+        data_statistics[str(self.telegram_id)]['last_use_bot'] = f'{datetime.now().date()}  ' \
+                                                            f'{str(datetime.now().time()).split(".")[0]}'
+
+        # все тайминги использования бота сохраняем в all_uses
+        data_statistics[str(self.telegram_id)]['all_uses'].append(data_statistics[str(self.telegram_id)]['last_use_bot'])
+
+        super().__init__(f'data_users/{self.telegram_id}user.json')
+        user_old_predictions = super().reed_json()  # все предсказания, которые отправлены этому юзеру
+        # print(user_old_predictions)
+        # print(data_statistics)
+        data_statistics[str(self.telegram_id)]['predictions'] = user_old_predictions
+        # print(data_statistics)
+        InJsonDict.__init__(self, 'statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
+        # начале метода было сделано, но без этого выдаёт ошибку
+
+        InJsonDict.update_dict(self, data_statistics)  # закидываем данные в json
 
 
 if __name__ == '__main__':
     os.chdir('../')  # поставить основную директорию другую (в данном случа я поставил bot_predictions
     # в качестве основной)
-    dima = WorkWithDataUsers('664295561')
-    print(dima.get_prediction())
+    # WorkWithDataUsers('664295561').add_info_about_user_statistics(count_touch_help=True)
+    # WorkWithDataUsers('112345678').add_info_about_user_statistics(username='lv_rey', full_name='lev reyn')
