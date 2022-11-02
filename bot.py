@@ -98,11 +98,12 @@ async def get_info_about_users_process_command(message: types.Message):
     if 'гейоргий' not in message.text:
         return None
     await bot.send_message(message.from_user.id, 'два вида статистики, в json формате и csv')
-    await message.answer_document(InputFile('statistics/data_about_users_statistics.json'))
+    await message.answer_document(InputFile('data_users/statistics/data_about_users_statistics.json'))
 
-    InJsonDict('statistics/data_about_users_statistics.json').json_in_csv('statistics/data_about_users_statistics.csv',
-                                                                          key_one=str(message.from_user.id))
-    await message.answer_document(InputFile('statistics/data_about_users_statistics.csv'))
+    InJsonDict('data_users/statistics/data_about_users_statistics.json').json_in_csv(
+        'data_users/statistics/data_about_users_statistics.csv',
+        key_one=str(message.from_user.id))
+    await message.answer_document(InputFile('data_users/statistics/data_about_users_statistics.csv'))
 
 
 # @dp.message_handler()

@@ -70,7 +70,7 @@ class WorkWithDataUsers(InJson, InJsonDict):
             тоже )
         """
 
-        InJsonDict.__init__(self, 'statistics/data_about_users_statistics.json')
+        InJsonDict.__init__(self, 'data_users/statistics/data_about_users_statistics.json')
 
         data_statistics = InJsonDict.reed_json(self)
         data_statistics: dict
@@ -113,7 +113,7 @@ class WorkWithDataUsers(InJson, InJsonDict):
         # print(data_statistics)
         data_statistics[str(self.telegram_id)]['predictions'] = user_old_predictions
         # print(data_statistics)
-        InJsonDict.__init__(self, 'statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
+        InJsonDict.__init__(self, 'data_users/statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
         # начале метода было сделано, но без этого выдаёт ошибку
 
         InJsonDict.update_dict(self, data_statistics)  # закидываем данные в json
