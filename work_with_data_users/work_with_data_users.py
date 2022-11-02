@@ -9,11 +9,11 @@ import csv
 class WorkWithDataUsers(InJson, InJsonDict):
     def __init__(self, telegram_id: str):
         self.telegram_id = telegram_id
-        super().__init__(f'data_users/{self.telegram_id}user.json')
+        super().__init__(f'data_users/sent_predictions_users/{self.telegram_id}user.json')
 
     def get_all_users(self):
         """получить все telegram_id юзеров"""
-        users_json = os.listdir('data_users')  # названия файлов юзеров
+        users_json = os.listdir('data_users/sent_predictions_users')  # названия файлов юзеров
         users_telegram_id = []
         for user in users_json:
             users_telegram_id.append(user.replace('user.json', ''))
@@ -30,7 +30,7 @@ class WorkWithDataUsers(InJson, InJsonDict):
         super().__init__('data_predictions/predictions.json')
         predictions = super().reed_json()
         predictions: list
-        super().__init__(f'data_users/{self.telegram_id}user.json')
+        super().__init__(f'data_users/sent_predictions_users/{self.telegram_id}user.json')
         user_old_predictions = super().reed_json()
         for need_del in user_old_predictions:
             predictions.remove(need_del)
@@ -41,9 +41,9 @@ class WorkWithDataUsers(InJson, InJsonDict):
     def get_info_about_users(self) -> list:
         """метод собирает информацию о пользователях бота, пока что просто их id и сколько они получили сообщений"""
         data_info_about_user_lst = []  # словарь, в котором ключи - это telegram_id, а значения - кол-во предсказаний
-        data_info_about_users = os.listdir('data_users')
+        data_info_about_users = os.listdir('data_users/sent_predictions_users')
         for user in data_info_about_users:
-            super().__init__(f'data_users/{user}')
+            super().__init__(f'data_users/sent_predictions_users/{user}')
             user_old_predictions = len(super().reed_json())  # количество отправленных предсказаний этому пользователю
             data_info_about_user_lst.append({
                 'telegram_id': user[:-9],
@@ -107,7 +107,7 @@ class WorkWithDataUsers(InJson, InJsonDict):
         # все тайминги использования бота сохраняем в all_uses
         data_statistics[str(self.telegram_id)]['all_uses'].append(data_statistics[str(self.telegram_id)]['last_use_bot'])
 
-        super().__init__(f'data_users/{self.telegram_id}user.json')
+        super().__init__(f'data_users/sent_predictions_users/{self.telegram_id}user.json')
         user_old_predictions = super().reed_json()  # все предсказания, которые отправлены этому юзеру
         # print(user_old_predictions)
         # print(data_statistics)
