@@ -33,7 +33,11 @@ class WorkWithDataUsers(InJson, InJsonDict):
         super().__init__(f'data_users/sent_predictions_users/{self.telegram_id}user.json')
         user_old_predictions = super().reed_json()
         for need_del in user_old_predictions:
-            predictions.remove(need_del)
+            try:
+                predictions.remove(need_del)
+            except ValueError:
+                print('данное предсказание удалено уже (его нет в data_predictions/predictions.json')
+
         if len(predictions) == 0:
             return 'на сегодня пиздец, нет у меня для тебя предсказания :('
         return self.add_prediction_in_user_file(choice(predictions))
@@ -141,6 +145,17 @@ class WorkWithDataUsers(InJson, InJsonDict):
                             'data_users/statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
         # начале метода было сделано, но без этого выдаёт ошибку
         InJsonDict.update_dict(self, data_statistics)  # закидываем данные в json
+
+    def add_new_predictions(self, new_prediction: str):
+        """добавляет новое предсказание в data_predictions/predictions.json
+            args:
+                new_prediction - новое предсказание
+            """
+        super().__init__('data_predictions/predictions.json')
+        super().update_list([new_prediction])
+        return True  # если возвращает данный метод True, значит он добавил и всё ок, хотя конечно он всегда будет
+        # возвращать True
+
 
 
 if __name__ == '__main__':

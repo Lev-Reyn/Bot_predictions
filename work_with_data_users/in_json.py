@@ -65,6 +65,23 @@ class InJson:
             self.lst_paste = json.load(file)
         return self.lst_paste
 
+    def json_lst_in_csv(self, name_csv_file: str, name_column: str):
+        """json файл со структурой список строк/чисел и закидывает в json, где столбцы: номел элемента и сам элемент
+            args:
+                name_csv_file - название файла для csv файла
+                name_column - названия для столбца с элментами списка
+        """
+        data_lst = self.reed_json()
+        with open(name_csv_file, 'w') as file:
+            fieldnames = ['№', name_column]
+            writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter=';')
+            writer.writeheader()
+            for i, elem in enumerate(data_lst):
+                writer.writerow({
+                    '№': i,
+                    name_column: elem
+                })
+
     def update_number_page(self, number_page: int):
         with open('number_page.txt', 'w') as file:
             file.write(str(number_page))
@@ -127,6 +144,7 @@ class InJsonDict:
 
 class InZIP:
     """класс для работы с zip архивами (дорабатывать ещё можно, а то пока что только закидывать в архив может"""
+
     def __init__(self, name_zip):
         self.name_zip = name_zip
 
@@ -148,4 +166,3 @@ if __name__ == '__main__':
     os.chdir('../')  # поставить основную директорию другую (в данном случа я поставил bot_predictions
 
     InZIP('data_users.zip').create_zip(directory='data_users')
-

@@ -8,7 +8,7 @@ from work_with_data_users.work_with_data_users import WorkWithDataUsers
 import aioschedule
 import asyncio
 from mytime.mytime import MyTime  # класс для подсчёта времени до следующего предсказания
-from work_with_data_users.in_json import InJsonDict, InZIP
+from work_with_data_users.in_json import InJsonDict, InZIP, InJson
 
 bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
@@ -119,6 +119,29 @@ async def get_zipfile_sent_predictions_users_process_command(message: types.Mess
     await message.answer_document(InputFile('data_users/sent_predictions_users.zip'))
 
 
+@dp.message_handler(commands=['add_prediction'])
+async def add_prediction_process_command(message: types.Message):
+    """добавить новое предсказание в список data_predictions/predictions.json"""
+    if 'гейоргий' not in message.text:
+        return None
+    new_prediction = message.text.replace('/add_prediction', '').replace('гейоргий', '').strip()
+    if WorkWithDataUsers(message.from_user.id).add_new_predictions(new_prediction=new_prediction):
+        await bot.send_message(message.from_user.id, f'предсказание <b>"{new_prediction}"</b> успешно добавлено!')
+    else:
+        await bot.send_message(message.from_user.id, 'что-то пошло не так, не получилось добавить :(')
+
+
+@dp.message_handler(commands=['show_all_predictions'])
+async def show_all_predictions_process_command(message: types.Message):
+    """отправляет все предсказания (в csv файлике), где подписано какое по номеру это предсказание"""
+    if 'гейоргий' not in message.text:
+        return None
+    InJson('data_predictions/predictions.json').json_lst_in_csv('data_predictions/predictions_for_show.csv',
+                                                                'predictions')
+    await bot.send_message(message.from_user.id, 'База данных с предсказаниями')
+    await message.answer_document(InputFile('data_predictions/predictions_for_show.csv'))
+
+
 # @dp.message_handler()
 async def timer_no_command():
     """отправляет всем зареганым предсказание"""
@@ -158,7 +181,7 @@ if __name__ == '__main__':
 #         await asyncio.sleep(1)
 
 
-
-# доработать get_info_about_users, что бы считало только количество тех, кто не заблокировал бота
-# создать команду, которая позволяет добавлять новые предсказания в бота удалённо
+# создать команду, которая удаляет выбраное предсказание в боте
 # создать команду админскую, которая рассказывает о всех командах в боте
+# решить проблему с тем, что если какое-то предсказние удалено, то не выскакивало ошибки, когда отправляются юзерам предсказания
+# создать проверку пароля (новый метод, для работы с паролями, а может и с двумя видами админов)
