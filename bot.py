@@ -85,15 +85,18 @@ async def get_info_about_users_process_command(message: types.Message):
      """
     if 'гейоргий' not in message.text:
         return None
+    WorkWithDataUsers(message.from_user.id).get_real_users()
     await bot.send_message(message.from_user.id,
-                           f'number of users {len(WorkWithDataUsers(message.from_user.id).get_info_about_users())}')
+                           f'number of users real {WorkWithDataUsers(message.from_user.id).get_real_users()}')
+    await bot.send_message(message.from_user.id,
+                           f'number of users all {len(WorkWithDataUsers(message.from_user.id).get_info_about_users())}')
     WorkWithDataUsers(message.from_user.id).create_csv_info_about_users()
     path = 'data_info_about_user.csv'
     await message.answer_document(InputFile(path))
 
 
 @dp.message_handler(commands=['get_statistics_about_users'])
-async def get_info_about_users_process_command(message: types.Message):
+async def get_statistics_about_users_process_command(message: types.Message):
     """получить статистику о юзерах """
     if 'гейоргий' not in message.text:
         return None
@@ -155,7 +158,7 @@ if __name__ == '__main__':
 #         await asyncio.sleep(1)
 
 
-#  доработать статистику, добавить количество отправленных предсказаний этому пользователю
+
 # доработать get_info_about_users, что бы считало только количество тех, кто не заблокировал бота
 # создать команду, которая позволяет добавлять новые предсказания в бота удалённо
 # создать команду админскую, которая рассказывает о всех командах в боте

@@ -39,16 +39,34 @@ class WorkWithDataUsers(InJson, InJsonDict):
         return self.add_prediction_in_user_file(choice(predictions))
 
     def get_info_about_users(self) -> list:
-        """метод собирает информацию о пользователях бота, пока что просто их id и сколько они получили сообщений"""
+        """метод собирает информацию о пользователях бота, пока что просто их id и сколько они получили сообщений, а
+        так же реальный пользователь или нет (если пользователь не заблокировал бота, то это реальный пользователь)"""
         data_info_about_user_lst = []  # словарь, в котором ключи - это telegram_id, а значения - кол-во предсказаний
         data_info_about_users = os.listdir('data_users/sent_predictions_users')
         for user in data_info_about_users:
             super().__init__(f'data_users/sent_predictions_users/{user}')
             user_old_predictions = len(super().reed_json())  # количество отправленных предсказаний этому пользователю
+            InJsonDict.__init__(self, 'data_users/statistics/data_about_users_statistics.json')
+            data_statistics = InJsonDict.reed_json(self)  # прочитали данные статистики
             data_info_about_user_lst.append({
                 'telegram_id': user[:-9],
-                'count_predictions': user_old_predictions})
+                'full_name': data_statistics[user[:-9]]['full_name'],
+                'count_predictions': user_old_predictions,
+                'work_or_stop': data_statistics[user[:-9]]['work_or_stop']
+            })
         return data_info_about_user_lst
+
+    def get_real_users(self):
+        """метод считает количество реальных пользователей в боте, тех людей,
+        которые не заблокировали бота (на основе статистики)"""
+        InJsonDict.__init__(self, 'data_users/statistics/data_about_users_statistics.json')
+        data_statistics = InJsonDict.reed_json(self)
+        data_statistics: dict
+        count_real_users = 0  # количество реальных пользователей, которые не заблокировали бота
+        for user in data_statistics.values():
+            if user['work_or_stop'] == "+":
+                count_real_users += 1
+        return count_real_users
 
     def create_csv_info_about_users(self, data_info_about_user_lst=None):
         """cоздаёт csv файл по списку словарей, если ничего не передали в метод, то собирает инфу о юзерах из
@@ -88,9 +106,9 @@ class WorkWithDataUsers(InJson, InJsonDict):
                 'count_touch_start': 0,
                 'predictions': []
             }
-        if username:
+        if username and username != '':
             data_statistics[str(self.telegram_id)]['username'] = username
-        if full_name:
+        if full_name and full_name != '':
             data_statistics[str(self.telegram_id)]['full_name'] = full_name
         if work_or_stop:
             data_statistics[str(self.telegram_id)]['work_or_stop'] = work_or_stop
@@ -122,7 +140,6 @@ class WorkWithDataUsers(InJson, InJsonDict):
         InJsonDict.__init__(self,
                             'data_users/statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
         # начале метода было сделано, но без этого выдаёт ошибку
-
         InJsonDict.update_dict(self, data_statistics)  # закидываем данные в json
 
 
