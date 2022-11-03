@@ -142,6 +142,27 @@ async def show_all_predictions_process_command(message: types.Message):
     await message.answer_document(InputFile('data_predictions/predictions_for_show.csv'))
 
 
+@dp.message_handler(commands=['delete_prediction'])
+async def delete_prediction_process_command(message: types.Message):
+    """команда, которая принимает индекс числа и удаляет предсказание по этому индексу"""
+    if 'гейоргий' not in message.text:
+        return None
+    try:
+        index_dell_prediction = int(message.text.replace('/delete_prediction', '').replace('гейоргий', ''))
+        deleted_predication = WorkWithDataUsers(message.from_user.id).delete_prediction(index_dell_prediction)
+        if deleted_predication:
+            await bot.send_message(message.from_user.id, f'Предсказание <b>{deleted_predication}</b> удалено')
+        else:
+            await bot.send_message(message.from_user.id, f'Индекса <b>{index_dell_prediction}</b> нет')
+
+    except ValueError:
+        await bot.send_message(message.from_user.id,
+                               f"Не могу понять что это за индекс (целое число)"
+                               f" <b>{message.text.replace('/delete_prediction', '').replace('гейоргий', '')}</b>")
+
+    # print(index_dell_prediction)
+
+
 # @dp.message_handler()
 async def timer_no_command():
     """отправляет всем зареганым предсказание"""
@@ -181,7 +202,6 @@ if __name__ == '__main__':
 #         await asyncio.sleep(1)
 
 
-# создать команду, которая удаляет выбраное предсказание в боте
+
 # создать команду админскую, которая рассказывает о всех командах в боте
-# решить проблему с тем, что если какое-то предсказние удалено, то не выскакивало ошибки, когда отправляются юзерам предсказания
 # создать проверку пароля (новый метод, для работы с паролями, а может и с двумя видами админов)

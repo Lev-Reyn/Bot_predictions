@@ -38,15 +38,20 @@ from datetime import datetime as dt
 # print(russian_time(hour=10, minute=1))
 
 
-import zipfile
+# import zipfile
+#
+# archive = zipfile.ZipFile('Archive.zip', mode='w')
+# try:
+#     archive.write('data_users/664295561user.json')
+#     archive.write('data_users/5352265596user.json')
+#     print('Files added.')
+# finally:
+#     print('Reading files now.')
+#     archive.close()
 
-archive = zipfile.ZipFile('Archive.zip', mode='w')
-try:
-    archive.write('data_users/664295561user.json')
-    archive.write('data_users/5352265596user.json')
-    print('Files added.')
-finally:
-    print('Reading files now.')
-    archive.close()
+
+lst = [1, 2]
+lst.pop(15)
+
 
 # zip_archive = zipfile.ZipFile("Archive.zip", "r") # list file information for file_info in zip_archive.infolist(): print(file_info.filename, file_info.date_time, file_info.file_size)

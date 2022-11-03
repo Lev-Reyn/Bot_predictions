@@ -156,6 +156,22 @@ class WorkWithDataUsers(InJson, InJsonDict):
         return True  # если возвращает данный метод True, значит он добавил и всё ок, хотя конечно он всегда будет
         # возвращать True
 
+    def delete_prediction(self, index_dell_prediction: int):
+        """удаляет предсказание из data_predictions/predictions.json
+            args:
+                index_dell_prediction - индекс предсказания, которое нужно удалить
+            возвращает:
+                True - если удалено
+                False -  выскочила ошибка, из-за того, что такого индекса там нет
+        """
+        super().__init__('data_predictions/predictions.json')
+        data_predictions = super().reed_json()
+        try:
+            deleted_predication = data_predictions.pop(index_dell_prediction)
+            super().write_list(lst=data_predictions)
+            return deleted_predication
+        except IndexError:
+            return False
 
 
 if __name__ == '__main__':

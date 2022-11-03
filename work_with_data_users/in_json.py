@@ -49,6 +49,13 @@ class InJson:
             with open(self.name_file, 'w') as file:
                 json.dump(lst, file, indent=4, ensure_ascii=False)
 
+    def write_list(self, lst: list):
+        """перезаписывает данные в json файл self.name_file
+            args:
+                lst - список, который закинуть в json файл self.name_file"""
+        with open(self.name_file, 'w') as file:
+            json.dump(lst, file, indent=4, ensure_ascii=False)
+
     def update_list(self, lst: list):
         """добавляет сожержимое lst в содержимое json файлика (а внутри него список должен быть)"""
         with open(self.name_file, 'r') as file:
