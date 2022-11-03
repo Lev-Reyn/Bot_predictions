@@ -79,6 +79,7 @@ async def get_info_about_users_process_command(message: types.Message):
      количество пользователей
      их telegram_id
      count_predictions
+     work_or_stop
      может потом ещё, что добавить можно будет, дополнительно проверка пароля будет так же
 
      для того, что бы запустилась эта команда, необходимо, что бы в сообщении было слово гейоргий
@@ -160,6 +161,18 @@ async def delete_prediction_process_command(message: types.Message):
                                f"Не могу понять что это за индекс (целое число)"
                                f" <b>{message.text.replace('/delete_prediction', '').replace('гейоргий', '')}</b>")
 
+
+@dp.message_handler(commands=['admin_commands'])
+async def admin_commands_process_command(message: types.Message):
+    """команда, которая отправляет все админские кманды, а то вдруг админ забыл команды"""
+    if 'гейоргий' not in message.text:
+        return None
+    with open('admin/admin_comands.txt', 'r') as file:
+        count_rows = file.read().count('\n')
+        file.seek(0)
+        for i in range(count_rows):
+            await bot.send_message(message.from_user.id, file.readline().replace('\n', ''))
+
     # print(index_dell_prediction)
 
 
@@ -200,7 +213,6 @@ if __name__ == '__main__':
 #     while True:
 #         await aioschedule.run_pending()
 #         await asyncio.sleep(1)
-
 
 
 # создать команду админскую, которая рассказывает о всех командах в боте
