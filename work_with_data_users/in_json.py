@@ -97,11 +97,11 @@ class InJsonDict:
 
     def reed_json(self):
         """считывает данные из файлика
-        можно в принципе посмотреть что в файлике через атрибут lst_paste,
+        можно в принципе посмотреть что в файлике через атрибут self.dict_paste,
         но если хотим обновить данные, то используем метод"""
         with open(self.name_file, 'r') as file:
-            self.lst_paste = json.load(file)
-        return self.lst_paste
+            self.dict_paste = json.load(file)
+        return self.dict_paste
 
     def json_in_csv(self, name_csv_file: str, key_one: str):
         """переделывает json в csv

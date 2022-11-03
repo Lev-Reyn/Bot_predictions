@@ -79,6 +79,7 @@ class WorkWithDataUsers(InJson, InJsonDict):
                 'telegram_id': str(self.telegram_id),
                 'username': '',
                 'full_name': '',
+                'count_sent_predictions': 0,
                 'work_or_stop': '',
                 'last_use_bot': '',
                 'all_uses': [],
@@ -100,12 +101,17 @@ class WorkWithDataUsers(InJson, InJsonDict):
         if count_touch_start:
             data_statistics[str(self.telegram_id)]['count_touch_start'] += 1
 
+        # всегда добавляем количество отправленных сообщений
+        super().__init__(f'data_users/sent_predictions_users/{self.telegram_id}user.json')
+        data_statistics[str(self.telegram_id)]['count_sent_predictions'] = len(super().reed_json())
+
         # всегда проверяем время, так как это время последнего использования бота
         data_statistics[str(self.telegram_id)]['last_use_bot'] = f'{datetime.now().date()}  ' \
-                                                            f'{str(datetime.now().time()).split(".")[0]}'
+                                                                 f'{str(datetime.now().time()).split(".")[0]}'
 
         # все тайминги использования бота сохраняем в all_uses
-        data_statistics[str(self.telegram_id)]['all_uses'].append(data_statistics[str(self.telegram_id)]['last_use_bot'])
+        data_statistics[str(self.telegram_id)]['all_uses'].append(
+            data_statistics[str(self.telegram_id)]['last_use_bot'])
 
         super().__init__(f'data_users/sent_predictions_users/{self.telegram_id}user.json')
         user_old_predictions = super().reed_json()  # все предсказания, которые отправлены этому юзеру
@@ -113,7 +119,8 @@ class WorkWithDataUsers(InJson, InJsonDict):
         # print(data_statistics)
         data_statistics[str(self.telegram_id)]['predictions'] = user_old_predictions
         # print(data_statistics)
-        InJsonDict.__init__(self, 'data_users/statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
+        InJsonDict.__init__(self,
+                            'data_users/statistics/data_about_users_statistics.json')  # не понимаю зачем это делать, ибо в
         # начале метода было сделано, но без этого выдаёт ошибку
 
         InJsonDict.update_dict(self, data_statistics)  # закидываем данные в json
