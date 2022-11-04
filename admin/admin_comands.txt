@@ -1,4 +1,5 @@
 /admin_commands <b>пароль</b> - посмотреть все админские команды
+/send_prediction <b>пароль</b> - отправляет предсказание всем пользователям бота, которые не отключили бота
 /get_info_about_users <b>пароль</b> - получить информацию о пользователях (telegram_id, full_name, count_predictions, work_or_stop)
 /get_statistics_about_users <b>пароль</b> - получить статистику о пользователях
 /get_zipfile_sent_predictions_users <b>пароль</b> - получить zipfile отправленных сообщений юзерам

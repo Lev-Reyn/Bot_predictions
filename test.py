@@ -50,8 +50,14 @@ from datetime import datetime as dt
 #     archive.close()
 
 
-lst = [1, 2]
-lst.pop(15)
 
 
+d1 = {
+    'name': 'lol'
+}
+d2 = {
+    'name': 'blin',
+    'surname': 'aaaa'
+}
+print(d1 | d2)
 # zip_archive = zipfile.ZipFile("Archive.zip", "r") # list file information for file_info in zip_archive.infolist(): print(file_info.filename, file_info.date_time, file_info.file_size)

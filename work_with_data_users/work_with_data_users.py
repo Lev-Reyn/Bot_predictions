@@ -52,11 +52,16 @@ class WorkWithDataUsers(InJson, InJsonDict):
             user_old_predictions = len(super().reed_json())  # количество отправленных предсказаний этому пользователю
             InJsonDict.__init__(self, 'data_users/statistics/data_about_users_statistics.json')
             data_statistics = InJsonDict.reed_json(self)  # прочитали данные статистики
+            user_full_name = data_statistics.get(user[:-9])
+            user_work_or_stop = data_statistics.get(user[:-9])
+            if user_full_name:  # ибо если юзер не добавлен в статистику, то выдаст ошибку, так как ключ нет в словаре
+                user_full_name = user_full_name.get('full_name')
+                user_work_or_stop = user_work_or_stop.get('work_or_stop')
             data_info_about_user_lst.append({
                 'telegram_id': user[:-9],
-                'full_name': data_statistics[user[:-9]]['full_name'],
+                'full_name': user_full_name,
                 'count_predictions': user_old_predictions,
-                'work_or_stop': data_statistics[user[:-9]]['work_or_stop']
+                'work_or_stop': user_work_or_stop
             })
         return data_info_about_user_lst
 
