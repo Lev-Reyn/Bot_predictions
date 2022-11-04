@@ -1,7 +1,7 @@
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-from aiogram.utils.exceptions import BotBlocked
+from aiogram.utils.exceptions import BotBlocked, ChatNotFound
 from aiogram.types import InputFile  # для того, что бы отправлять файлы
 from config import token
 from work_with_data_users.work_with_data_users import WorkWithDataUsers
@@ -9,11 +9,13 @@ import aioschedule
 import asyncio
 from mytime.mytime import MyTime  # класс для подсчёта времени до следующего предсказания
 from work_with_data_users.in_json import InJsonDict, InZIP, InJson
+from admin.admin import Admin  # класс для работы с админами
 
 bot = Bot(token, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
 
 time_predications = '10:14'  # время отправления предсказания
+admin_password = 'гейоргий'
 
 
 @dp.message_handler(commands=['start'])
@@ -38,7 +40,7 @@ async def send_predictions_process_command(message: types.Message):
     """отправляет всем зареганым предсказание
 
     для того, что бы запустилась эта команда, необходимо, что бы в сообщении было слово гейоргий"""
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     # print(message.text)
     for user_telegram_id in WorkWithDataUsers(message.from_user.id).get_all_users():
@@ -49,6 +51,9 @@ async def send_predictions_process_command(message: types.Message):
             # нужно добавлять в список тех, кто остановил бота, и возможно потом удалять их, хз
             WorkWithDataUsers(user_telegram_id).add_info_about_user_statistics(work_or_stop='-')
             print(f'пользователь с telegram_id {user_telegram_id} остановил бота')
+        except ChatNotFound:
+            WorkWithDataUsers(user_telegram_id).add_info_about_user_statistics(work_or_stop='-')
+            print(f'с пользователем с telegram_id {user_telegram_id} даже и не было чата, он из другого бота')
 
 
 @dp.message_handler(commands=['help'])
@@ -84,7 +89,7 @@ async def get_info_about_users_process_command(message: types.Message):
 
      для того, что бы запустилась эта команда, необходимо, что бы в сообщении было слово гейоргий
      """
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     WorkWithDataUsers(message.from_user.id).get_real_users()
     await bot.send_message(message.from_user.id,
@@ -99,7 +104,7 @@ async def get_info_about_users_process_command(message: types.Message):
 @dp.message_handler(commands=['get_statistics_about_users'])
 async def get_statistics_about_users_process_command(message: types.Message):
     """получить статистику о юзерах """
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     await bot.send_message(message.from_user.id, 'два вида статистики, в json формате и csv')
     await message.answer_document(InputFile('data_users/statistics/data_about_users_statistics.json'))
@@ -113,7 +118,7 @@ async def get_statistics_about_users_process_command(message: types.Message):
 @dp.message_handler(commands=['get_zipfile_sent_predictions_users'])
 async def get_zipfile_sent_predictions_users_process_command(message: types.Message):
     """получить zipfile отправленных сообщений юзерам"""
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     # закидываем в zip файл все файлы из data_users/sent_predictions_users
     InZIP('data_users/sent_predictions_users.zip').create_zip('data_users/sent_predictions_users')
@@ -123,9 +128,12 @@ async def get_zipfile_sent_predictions_users_process_command(message: types.Mess
 @dp.message_handler(commands=['add_prediction'])
 async def add_prediction_process_command(message: types.Message):
     """добавить новое предсказание в список data_predictions/predictions.json"""
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     new_prediction = message.text.replace('/add_prediction', '').replace('гейоргий', '').strip()
+    if new_prediction == '':  # если вызвали команду, и не добавили само предсказание, которое добавить, то вот)
+        await bot.send_message(message.from_user.id, 'Пустое предсказание 😕')
+        return None
     if WorkWithDataUsers(message.from_user.id).add_new_predictions(new_prediction=new_prediction):
         await bot.send_message(message.from_user.id, f'предсказание <b>"{new_prediction}"</b> успешно добавлено!')
     else:
@@ -135,7 +143,7 @@ async def add_prediction_process_command(message: types.Message):
 @dp.message_handler(commands=['show_all_predictions'])
 async def show_all_predictions_process_command(message: types.Message):
     """отправляет все предсказания (в csv файлике), где подписано какое по номеру это предсказание"""
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     InJson('data_predictions/predictions.json').json_lst_in_csv('data_predictions/predictions_for_show.csv',
                                                                 'predictions')
@@ -146,7 +154,7 @@ async def show_all_predictions_process_command(message: types.Message):
 @dp.message_handler(commands=['delete_prediction'])
 async def delete_prediction_process_command(message: types.Message):
     """команда, которая принимает индекс числа и удаляет предсказание по этому индексу"""
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     try:
         index_dell_prediction = int(message.text.replace('/delete_prediction', '').replace('гейоргий', ''))
@@ -165,7 +173,7 @@ async def delete_prediction_process_command(message: types.Message):
 @dp.message_handler(commands=['admin_commands'])
 async def admin_commands_process_command(message: types.Message):
     """команда, которая отправляет все админские кманды, а то вдруг админ забыл команды"""
-    if 'гейоргий' not in message.text:
+    if not Admin('admin/admins_telegram_id.json').check_id(message.from_user.id) and admin_password not in message.text:
         return None
     with open('admin/admin_comands.txt', 'r') as file:
         count_rows = file.read().count('\n')
@@ -179,7 +187,7 @@ async def admin_commands_process_command(message: types.Message):
 # @dp.message_handler()
 async def timer_no_command():
     """отправляет всем зареганым предсказание"""
-    print('pizda')
+    # print('pizda')
     for user_telegram_id in WorkWithDataUsers('664295561').get_all_users():
         try:
             await bot.send_message(user_telegram_id, WorkWithDataUsers(user_telegram_id).get_prediction())
@@ -216,6 +224,5 @@ if __name__ == '__main__':
 
 
 # добавить возможность производить админские команды без пароля, по id, но и оставить возможность вводить пароль
+# добавить конструктор создания опросов
 # создать проверку пароля (новый метод, для работы с паролями, а может и с двумя видами админов)
-
-data_users/sent_predictions_users

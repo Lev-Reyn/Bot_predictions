@@ -119,6 +119,16 @@ class InJsonDict:
         with open(self.name_file, 'w') as file:
             json.dump(self.dict_past, file, indent=4, ensure_ascii=False)
 
+    def write_dict(self, dictionary: dict):
+        """перезаписать данные словаря
+            args:
+                dictionary - словарь, который нужно закинуть в self.name_file
+        """
+        if not isinstance(dictionary, dict):
+            raise ValueError('The dictionary must be of the dict type')
+        with open(self.name_file, 'w') as file:
+            json.dump(dictionary, file, indent=4, ensure_ascii=False)
+
     def reed_json(self):
         """считывает данные из файлика
         можно в принципе посмотреть что в файлике через атрибут self.dict_paste,
